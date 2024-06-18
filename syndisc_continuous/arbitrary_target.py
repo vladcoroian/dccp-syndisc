@@ -273,7 +273,7 @@ def plot_synergy_grid_size():
     # Initialize the data collection
     results = {}
     
-    ns = range(3, 26, 2)
+    ns = range(3, 10, 2)
     for rho12, rho13, rho23 in correlations:
         mi = mutual_information_gaussian(rho12, rho23, rho13)
         data = []
@@ -303,7 +303,7 @@ def plot_synergy_grid_size():
 
 if __name__ == "__main__":
     n, m = 10, 10
-    # plot_synergy_by_rho(n, m)
+    plot_synergy_by_rho(n, m)
     # plot_synergy_heatmap(n, m)
-    plot_synergy_grid_size()
+    # plot_synergy_grid_size()
 
