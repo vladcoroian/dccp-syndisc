@@ -1,3 +1,23 @@
+DCCP-SYNDISC: Scalable extension of SYNDISC using Disciplined Convex-Concave Programming (DCCP)
+====================================================
+
+This package provides a scalable extension of the original SYNDISC algorithm using Disciplined Convex-Concave Programming (DCCP). This repository contains the companion software for the MEng Individual Project at Imperial College London.
+
+The additional software is organised as follows:
+
+- `dccp-syndisc/` contains the main implementation of the DCCP-SYNDISC algorithm:
+  - `dccp_syndisc.py` contains the main implementation of the DCCP-SYNDISC algorithm.
+  - `dccp_utils.py` contains utility functions used in the DCCP-SYNDISC algorithm.
+  - `hpc_experiments/` contain the scripts used to run the real-world data experiments on the HPC cluster.
+  - `corr_and_gate.py` contains a minimal example of the DCCP-SYNDISC algorithm on a simple distribution, replicating the AND gate example from the original SYNDISC paper.
+  - `experiment_results/` contains the evaluation results on real-world data obtained by running the scripts in `hpc_experiments/`.
+  - `discrete_testing/` contains the evaluation results on synthetic data obtained by running `synthetic_data_tests.py`.
+
+- `syndisc_continuous/` contains a proof-of-concept implementation of the SYNDISC algorithm for continuous distributions:
+  - `arbitrary_target.py` contains the main implementation of the SYNDISC algorithm for continuous distributions with an arbitrary target variable. This contains three examples: varying the grid size, varying the correlation between sources, and varying the correlation between the sources and the target. 
+  - `self_disclosure.py` contains the main implementation of the SYNDISC algorithm for continuous distributions with the target variable being the source set. This contains three examples: varying the grid size, sources following a Gaussian copula, and sources following a Gumbel copula.
+  - `gaussian_copula_plot.py` contains a simple script to plot the Gaussian copula used in the continuous distribution experiments.
+
 SYNDISC: SYNergistic information via data DISClosure
 ====================================================
 
