@@ -13,7 +13,7 @@ The additional software is organised as follows:
   - `experiment_results/` contains the evaluation results on real-world data obtained by running the scripts in `hpc_experiments/`.
   - `discrete_testing/` contains the evaluation results on synthetic data obtained by running `synthetic_data_tests.py`.
 
-- `syndisc_continuous/` contains a proof-of-concept implementation of the SYNDISC algorithm for continuous distributions:
+- `syndisc_continuous/` contains a proof-of-concept implementation of the synergy measure described in the paper below to continuous distributions. This is a standalone piece of software that can be used to compute the synergy measure for continuous distributions. The package is organised as follows:
   - `arbitrary_target.py` contains the main implementation of the SYNDISC algorithm for continuous distributions with an arbitrary target variable. This contains three examples: varying the grid size, varying the correlation between sources, and varying the correlation between the sources and the target. 
   - `self_disclosure.py` contains the main implementation of the SYNDISC algorithm for continuous distributions with the target variable being the source set. This contains three examples: varying the grid size, sources following a Gaussian copula, and sources following a Gumbel copula.
   - `gaussian_copula_plot.py` contains a simple script to plot the Gaussian copula used in the continuous distribution experiments.
