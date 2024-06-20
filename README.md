@@ -18,6 +18,8 @@ The additional software is organised as follows:
   - `self_disclosure.py` contains the main implementation of the SYNDISC algorithm for continuous distributions with the target variable being the source set. This contains three examples: varying the grid size, sources following a Gaussian copula, and sources following a Gumbel copula.
   - `gaussian_copula_plot.py` contains a simple script to plot the Gaussian copula used in the continuous distribution experiments.
 
+Note: The software requires an active Gurobi license.
+
 SYNDISC: SYNergistic information via data DISClosure
 ====================================================
 
