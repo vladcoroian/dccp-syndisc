@@ -21,7 +21,7 @@ def synergy(py, pXgyk, Px, PWgX):
 
 
 def select_random_distribution(n):
-    """Generate a random probability distribution with constraints on the random variable functions."""
+    """Generate a random probability distribution with binary components."""
     new_dist = dit.random_distribution(n, ['01'])
     new_dist = dit.insert_rvf(new_dist, lambda x: '1' if all(map(bool, map(int, x))) else '0')
     return new_dist
@@ -63,16 +63,22 @@ def valid_constraints_check(py, pXgyk, Px, PWgX, A, ApX, eps):
 
 def dccp_optimisation_polytope(py, PWgX, Px, A, ApX):
     # print('starting polytope phase...')
+    
+    # Initialise the variables
     pXgyk = []
     for k in range(len(py)):
         x = cvx.Variable(len(Px))
         x.value = Px
         pXgyk.append(x)
+        
+    # Prepare the constraints
     cons = []
     for k in range(len(py)):
         cons += [0 <= pXgyk[k], pXgyk[k] <= 1]
         cons += [cvx.sum(pXgyk[k]) == 1]
         cons += [A @ pXgyk[k] == ApX]
+        
+    # Prepare the objective function
     pXgyk_full = cvx.hstack(pXgyk)
     big_py = np.eye(len(Px)) * py[0]
     for k in range(1, len(py)):
@@ -85,16 +91,19 @@ def dccp_optimisation_polytope(py, PWgX, Px, A, ApX):
         big_py_for_W += [py[k]] * W_elems
     prob = cvx.Problem(cvx.Minimize(big_py_for_W @ cvx.entr(big_PWgX @ pXgyk_full)), cons)
 
+    # Solve the problem using DCCP
     prob.solve(method='dccp', max_iter=50, solver=cvx.GUROBI, verbose=False, ccp_times=1, warm_start=True)
     return [pXgyk[k].value for k in range(len(py))]
 
 
 def dccp_optimisation_distribution(pXgyk, PWgX, Px, len_py, py_guess=None):
     # print('starting distribution phase...')
+    # Compute the coefficients for fixed polytope points
     entropies = []
     for k in range(len_py):
         entropies.append(entropy(PWgX @ pXgyk[k], base=2))
 
+    # Add the constraints for the distribution
     py_var = cvx.Variable(len_py)
     py_var.value = py_guess
     cons = [0 <= py_var, py_var <= 1, cvx.sum(py_var) == 1]
@@ -102,6 +111,8 @@ def dccp_optimisation_distribution(pXgyk, PWgX, Px, len_py, py_guess=None):
     for k in range(len_py):
         sum_px_cons += py_var[k] * pXgyk[k]
     cons += [sum_px_cons == Px]
+    
+    # Prepare objective function and solve using LP
     expr = 0
     for k in range(len_py):
         if entropies[k] > 0:
@@ -124,9 +135,11 @@ def dccp_synergy(dist, len_py=10, py_guess=None, iterations=20, eps=1e-10, verbo
     iter_dict = {}
     best_syn, best_py, best_pXgyK = 0, None, None
     for i in range(iterations):
+        # Initialise the distribution to a random probability distribution
         py = np.random.rand(len_py)
         py = py / sum(py)
         try:
+            # Step 1: Polytope optimisation
             pXgyk = dccp_optimisation_polytope(py, PWgX, Px, A, ApX)
         except Exception as e:
             print('ERROR: ', e)
@@ -136,6 +149,7 @@ def dccp_synergy(dist, len_py=10, py_guess=None, iterations=20, eps=1e-10, verbo
         if verbose:
             print(f'{i}-1: syn: ', synergy(py, pXgyk, Px, PWgX))
         try:
+            # Step 2: Distribution optimisation
             py = dccp_optimisation_distribution(pXgyk, PWgX, Px, len_py, py)
         except Exception as e:
             print('ERROR: ', e)
@@ -143,6 +157,7 @@ def dccp_synergy(dist, len_py=10, py_guess=None, iterations=20, eps=1e-10, verbo
         if not valid_constraints_check(py, pXgyk, Px, PWgX, A, ApX, eps):
             continue
         syn = synergy(py, pXgyk, Px, PWgX)
+        # If current iteration has the best synergy, update the best synergy and the corresponding distributions
         if syn > best_syn:
             best_syn, best_py, best_pXgyK = syn, py, pXgyk
         end_time_iter = perf_counter()
@@ -152,9 +167,11 @@ def dccp_synergy(dist, len_py=10, py_guess=None, iterations=20, eps=1e-10, verbo
     if verbose:
         print('------------')
         print('best syn: ', best_syn)
+    # If all_iterations is True, return the dictionary of all the iterations
     if all_iterations:
         return iter_dict
     end_time = perf_counter()
+    # Otherwise, return the best synergy and the time taken to compute it
     return best_syn, end_time - start_time
 
 def optimal_synergy_channel(dist, len_py=10, py_guess=None, iterations=10, eps=1e-12, verbose=False):
